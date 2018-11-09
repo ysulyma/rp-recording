@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const { CheckerPlugin } = require('awesome-typescript-loader')
 
 module.exports = {
@@ -32,8 +33,15 @@ module.exports = {
     ]
   },
 
+  optimization: {
+    noEmitOnErrors: false
+  },
+
   plugins: [
-    new CheckerPlugin()
+    new CheckerPlugin(),
+    new webpack.BannerPlugin({
+      banner: () => require('fs').readFileSync('./LICENSE', {encoding: 'utf8'})
+    })
   ],
 
   resolve: {

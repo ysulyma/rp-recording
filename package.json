@@ -20,6 +20,7 @@
     "@types/chrome": "0.0.69",
     "@types/react": "^16.6.0",
     "@types/react-dom": "^16.6.0",
+    "banner-webpack-plugin": "^0.2.3",
     "typescript": "^3.0.0"
   }
 }
