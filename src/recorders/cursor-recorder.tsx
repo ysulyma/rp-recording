@@ -1,11 +1,11 @@
-import * as React from 'react';
+import * as React from "react";
 
-import {Recorder, RecorderPlugin, RecorderConfigureComponent} from '../recorder';
+import {Recorder, RecorderPlugin, RecorderConfigureComponent} from "../recorder";
 
-import {$, $$} from '../utils/dom';
-import {on, off} from '../utils/events';
+import {$, $$} from "../utils/dom";
+import {on, off} from "../utils/events";
 
-import {Utils, ReplayData} from 'ractive-player';
+import {Utils, ReplayData} from "ractive-player";
 const {bind} = Utils.misc;
 
 type Path = ReplayData<[number, number]>;
@@ -20,7 +20,7 @@ export class CursorRecorder implements Recorder {
   private paused: boolean;
 
   constructor() {
-    bind(this, ['captureMouse']);
+    bind(this, ["captureMouse"]);
   }
 
   beginRecording(baseTime: number) {
@@ -30,7 +30,7 @@ export class CursorRecorder implements Recorder {
     this.pauseTime = 0;
     this.paused = false;
 
-    on(document.body, 'mousemove', this.captureMouse);
+    on(document.body, "mousemove", this.captureMouse);
   }
 
   pauseRecording(time: number) {
@@ -44,7 +44,7 @@ export class CursorRecorder implements Recorder {
   }
 
   async endRecording(): Promise<Path> {
-    off(document.body, 'mousemove', this.captureMouse);
+    off(document.body, "mousemove", this.captureMouse);
 
     for (let i = this.captureData.length - 1; i >= 1; --i) {
       this.captureData[i][0] -= this.captureData[i-1][0];
@@ -59,7 +59,7 @@ export class CursorRecorder implements Recorder {
   captureMouse(e: MouseEvent) {
     if (this.paused) return;
 
-    const {left, top} = ($('.rp-canvas') as HTMLDivElement).getBoundingClientRect(),
+    const {left, top} = ($(".rp-canvas") as HTMLDivElement).getBoundingClientRect(),
           vmin = Math.min(innerWidth, innerHeight);
 
     this.captureData.push([
@@ -78,21 +78,21 @@ export class CursorRecorder implements Recorder {
 
 export class CursorConfigureComponent extends RecorderConfigureComponent {
   render() {
-    const classNames = ['recorder-plugin-icon']
+    const classNames = ["recorder-plugin-icon"];
 
     if (this.state.active)
-      classNames.push('active');
+      classNames.push("active");
 
     return (
       <div className="recorder-plugin" title="Record cursor">
         <div
           className="recorder-plugin-icon"
-          style={{backgroundColor: this.state.active ? 'red' : '#222', height: '36px', lineHeight: '36px', width: '36px'}}
+          style={{backgroundColor: this.state.active ? "red" : "#222", height: "36px", lineHeight: "36px", width: "36px"}}
         >
           <img
             height="28" width="28" src="/img/cursor-large.png"
             onClick={this.toggleActive}
-            style={{verticalAlign: 'middle'}}
+            style={{verticalAlign: "middle"}}
           />
         </div>
         <span className="recorder-plugin-name">Cursor</span>
@@ -133,10 +133,10 @@ function offsetParent(node: HTMLElement) {
 
   let parent = node;
   while (parent = (parent.parentNode as HTMLElement)) {
-    if (parent.nodeName.toLowerCase() === 'main') {
+    if (parent.nodeName.toLowerCase() === "main") {
       console.log("MAIN");
     }
-    if (!['absolute', 'relative'].includes(getComputedStyle(parent).position)) continue;
+    if (!["absolute", "relative"].includes(getComputedStyle(parent).position)) continue;
 
     const prect = parent.getBoundingClientRect();
 

@@ -5,12 +5,12 @@ type BlobEvent = any;
 declare const RACTIVE_GLOBAL: any;
 declare const MediaRecorder: MediaRecorder;
 
-import * as React from 'react';
-import {Recorder, RecorderConfigureComponent, RecorderPlugin} from '../recorder';
+import * as React from "react";
+import {Recorder, RecorderConfigureComponent, RecorderPlugin} from "../recorder";
 
-import {on, off} from '../utils/events';
+import {on, off} from "../utils/events";
 
-import {Player, Utils} from 'ractive-player';
+import {Player, Utils} from "ractive-player";
 const {bind} = Utils.misc,
       {formatTimeMs} = Utils.time;
 
@@ -36,7 +36,7 @@ export class CueRecorder implements Recorder {
   constructor(player: Player) {
     this.player = player;
 
-    bind(this, ['onKeyDown']);
+    bind(this, ["onKeyDown"]);
   }
 
   beginRecording(time: number) {
@@ -47,7 +47,7 @@ export class CueRecorder implements Recorder {
     this.paused = false;
     this.pauseTime = 0;
 
-    on(document.body, 'keydown', this.onKeyDown);
+    on(document.body, "keydown", this.onKeyDown);
   }
 
   pauseRecording(time: number) {
@@ -61,7 +61,7 @@ export class CueRecorder implements Recorder {
   }
 
   async endRecording() {
-    off(document.body, 'keydown', this.onKeyDown);
+    off(document.body, "keydown", this.onKeyDown);
     this.captureCues(this.player.script.slideName);
     return this.cueCapture;
   }
@@ -72,7 +72,7 @@ export class CueRecorder implements Recorder {
     const {script} = this.player;
     if (!this.player.$controls.captureKeys) return;
 
-    if (e.key.toLowerCase() === 'e')
+    if (e.key.toLowerCase() === "e")
       this.captureCues(script.slides[script.slideIndex - 1][0]);
   }
 
@@ -86,15 +86,15 @@ export class CueRecorder implements Recorder {
 
 export class CueConfigureComponent extends RecorderConfigureComponent {
   render() {
-    const classNames = ['recorder-plugin-icon']
+    const classNames = ["recorder-plugin-icon"];
 
     if (this.state.active)
-      classNames.push('active');
+      classNames.push("active");
 
     return (
       <div className="recorder-plugin" title="Record cues">
-        <svg className={classNames.join(' ')} height="36" width="36" viewBox="0 0 100 100" onClick={this.toggleActive}>
-          <rect height="100" width="100" fill={this.state.active ? 'red' : '#222'}/>
+        <svg className={classNames.join(" ")} height="36" width="36" viewBox="0 0 100 100" onClick={this.toggleActive}>
+          <rect height="100" width="100" fill={this.state.active ? "red" : "#222"}/>
           {cueIcon}
         </svg>
         <span className="recorder-plugin-name">Cues</span>

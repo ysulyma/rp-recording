@@ -1,8 +1,8 @@
-import * as React from 'react';
+import * as React from "react";
 
-import {Recorder, RecorderPlugin, RecorderConfigureComponent} from '../recorder';
+import {Recorder, RecorderPlugin, RecorderConfigureComponent} from "../recorder";
 
-import {Player} from 'ractive-player';
+import {Player} from "ractive-player";
 
 type CaptureDatum = [number, object];
 
@@ -70,15 +70,15 @@ export class StateRecorder implements Recorder {
 
 export class StateConfigureComponent extends RecorderConfigureComponent {
   render() {
-    const classNames = ['recorder-plugin-icon']
+    const classNames = ["recorder-plugin-icon"];
 
     if (this.state.active)
-      classNames.push('active');
+      classNames.push("active");
 
     return (
       <div className="recorder-plugin" title="Record state of React component">
         <svg className="recorder-plugin-icon" height="36" width="36" viewBox="0 0 100 100" onClick={this.toggleActive}>
-          <rect height="100" width="100" fill={this.state.active ? 'red' : '#222'}/>
+          <rect height="100" width="100" fill={this.state.active ? "red" : "#222"}/>
           {stateIcon}
         </svg>
         <span className="recorder-plugin-name">State</span>

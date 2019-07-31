@@ -1,9 +1,9 @@
-import {aspectRatio, Utils} from 'ractive-player';
+import {aspectRatio, Utils} from "ractive-player";
 
 const {screenToSVGVector} = Utils.graphics,
       {dragHelper} = Utils.interactivity;
 
-import * as dom from './utils/dom';
+import * as dom from "./utils/dom";
 const {$, $$} = dom;
 
 const global: any = window;
@@ -18,13 +18,13 @@ const Editor = {
 
     // CSS
     if (node instanceof HTMLElement || node instanceof SVGSVGElement) 
-      node.style.position = 'absolute';
+      node.style.position = "absolute";
 
     // attach handlers
     if (node instanceof HTMLElement || node instanceof SVGSVGElement)
-      node.addEventListener('mousedown', dragHelper(mouseMoveHTML, mouseDown, mouseUp) as EventListener);
+      node.addEventListener("mousedown", dragHelper(mouseMoveHTML, mouseDown, mouseUp) as EventListener);
     else
-      node.addEventListener('mousedown', dragHelper(mouseMoveSVG, mouseDown, mouseUp) as EventListener);
+      node.addEventListener("mousedown", dragHelper(mouseMoveSVG, mouseDown, mouseUp) as EventListener);
 
     function mouseDown(e: MouseEvent) {
       e.stopPropagation();
@@ -34,8 +34,8 @@ const Editor = {
       lastY = e.pageY;
 
       // coords box
-      coordsBox = dom.elt('span');
-      coordsBox.className = 'coordinates-box';
+      coordsBox = dom.elt("span");
+      coordsBox.className = "coordinates-box";
 
       let left, top;
 
@@ -114,19 +114,19 @@ const Editor = {
 /* figure out which attribute to modify to move */
 function svgXAttr(node: SVGElement): string {
   switch (node.nodeName) {
-    case 'circle':
-      return 'cx';
+    case "circle":
+      return "cx";
     default:
-      return 'x';
+      return "x";
   }
 }
 
 function svgYAttr(node: SVGElement): string {
   switch (node.nodeName) {
-    case 'circle':
-      return 'cy';
+    case "circle":
+      return "cy";
     default:
-      return 'y';
+      return "y";
   }
 }
 
@@ -134,20 +134,20 @@ function svgYAttr(node: SVGElement): string {
 function svgParent(node: SVGElement): SVGSVGElement {
   let parent = node;
   while (parent = <SVGElement>parent.parentNode)
-    if (parent.nodeName.toLowerCase() === 'svg')
+    if (parent.nodeName.toLowerCase() === "svg")
       return <SVGSVGElement>parent;
 }
 
 // stupid helper function
 function offsetParent(node: HTMLElement | SVGElement) {
-  if (typeof (<HTMLElement>node).offsetLeft !== 'undefined' && typeof (<HTMLElement>node).offsetTop !== 'undefined')
+  if (typeof (<HTMLElement>node).offsetLeft !== "undefined" && typeof (<HTMLElement>node).offsetTop !== "undefined")
     return { left: (<HTMLElement>node).offsetLeft, top: (<HTMLElement>node).offsetTop };
 
   const rect = node.getBoundingClientRect();
 
   let parent = node;
   while (parent = <HTMLElement>parent.parentNode) {
-    if (!['absolute', 'relative'].includes(getComputedStyle(parent).position)) continue;
+    if (!["absolute", "relative"].includes(getComputedStyle(parent).position)) continue;
 
     const prect = parent.getBoundingClientRect();
 
@@ -163,7 +163,7 @@ export default function() {
   global._edit = { "data-ractive-editor-draggable": "yes" };
   
   document.addEventListener("DOMContentLoaded", () => {
-    $$('*[data-ractive-editor-draggable]').forEach(Editor.makeDraggable);
+    $$("*[data-ractive-editor-draggable]").forEach(Editor.makeDraggable);
   });  
 }
 

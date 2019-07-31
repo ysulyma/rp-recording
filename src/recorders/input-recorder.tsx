@@ -1,10 +1,10 @@
-import * as React from 'react';
+import * as React from "react";
 
-import {Recorder, RecorderPlugin, RecorderConfigureComponent} from '../recorder';
+import {Recorder, RecorderPlugin, RecorderConfigureComponent} from "../recorder";
 
-import {Player} from 'ractive-player';
+import {Player} from "ractive-player";
 
-import {on, off} from '../utils/events';
+import {on, off} from "../utils/events";
 
 type CaptureDatum = [number, any];
 type FormElement = HTMLInputElement | HTMLTextAreaElement;
@@ -75,15 +75,15 @@ export class InputRecorder implements Recorder {
 
 export class InputConfigureComponent extends RecorderConfigureComponent {
   render() {
-    const classNames = ['recorder-plugin-icon']
+    const classNames = ["recorder-plugin-icon"];
 
     if (this.state.active)
-      classNames.push('active');
+      classNames.push("active");
 
     return (
       <div className="recorder-plugin" title="Record input">
         <svg className="recorder-plugin-icon" height="36" width="36" viewBox="0 0 100 100" onClick={this.toggleActive}>
-          <rect height="100" width="100" fill={this.state.active ? 'red' : '#222'}/>
+          <rect height="100" width="100" fill={this.state.active ? "red" : "#222"}/>
           {inputIcon}
         </svg>
         <span className="recorder-plugin-name">Input</span>

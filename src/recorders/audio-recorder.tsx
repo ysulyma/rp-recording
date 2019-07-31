@@ -4,9 +4,9 @@ type BlobEvent = any;
 
 declare const MediaRecorder: MediaRecorder;
 
-import * as React from 'react';
-import {Recorder, RecorderPlugin, RecorderConfigureComponent} from '../recorder';
-import {on} from '../utils/events';
+import * as React from "react";
+import {Recorder, RecorderPlugin, RecorderConfigureComponent} from "../recorder";
+import {on} from "../utils/events";
 
 type Cue = [string, string];
 
@@ -68,7 +68,7 @@ export class AudioRecorder implements Recorder {
   private promise: Promise<string>;
 
   beginRecording(baseTime: number) {
-    if (document.location.protocol !== 'https:') alert("Page must be accessed via HTTPS in order to record audio");
+    if (document.location.protocol !== "https:") alert("Page must be accessed via HTTPS in order to record audio");
     
     this.promise = new Promise(async (resolve, reject) => {
       // record the audio
@@ -78,12 +78,12 @@ export class AudioRecorder implements Recorder {
       this.recorder = new MediaRecorder(stream);
 
       // subscribe to events
-      on(this.recorder, 'dataavailable', (e: BlobEvent) => {
+      on(this.recorder, "dataavailable", (e: BlobEvent) => {
         chunks.push(e.data);
       });
 
-      on(this.recorder, 'stop', () => {
-        const blob = new Blob(chunks, {type: 'audio/webm'});
+      on(this.recorder, "stop", () => {
+        const blob = new Blob(chunks, {type: "audio/webm"});
 
         resolve(URL.createObjectURL(blob));
       });
@@ -109,15 +109,15 @@ export class AudioRecorder implements Recorder {
 
 export class AudioConfigureComponent extends RecorderConfigureComponent {
   render() {
-    const classNames = ['recorder-plugin-icon']
+    const classNames = ["recorder-plugin-icon"];
 
     if (this.state.active)
-      classNames.push('active');
+      classNames.push("active");
 
     return (
       <div className="recorder-plugin" title="Record audio">
-        <svg className={classNames.join(' ')} height="36" width="36" viewBox="0 0 100 100" onClick={this.toggleActive}>
-          <rect height="100" width="100" fill={this.state.active ? 'red' : '#222'}/>
+        <svg className={classNames.join(" ")} height="36" width="36" viewBox="0 0 100 100" onClick={this.toggleActive}>
+          <rect height="100" width="100" fill={this.state.active ? "red" : "#222"}/>
           {audioIcon}
         </svg>
         <span className="recorder-plugin-name">Audio</span>
