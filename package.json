@@ -22,6 +22,7 @@
   "homepage": "https://github.com/ysulyma/ractive-editor#readme",
   "dependencies": {
     "@types/chrome": "0.0.69",
+    "@types/node": "^12.6.8",
     "@types/react": "^16.6.0",
     "@types/react-dom": "^16.6.0",
     "typescript": "^3.0.0"
