@@ -4,9 +4,9 @@
 
 This module provides an interface for authoring _ractives_, to be played with [`ractive-player`](https://github.com/ysulyma/ractive-player/).
 
-This was originally made just for my own personal use, and it's still in the process of being turned into something generally usable. Right now the documentation is this README and "read the source". The styles for this are mixed in with the main code in [`ractive-player`](https://github.com/ysulyma/ractive-player/). In a couple places you will need to modify the source yourself.
+This was originally made just for my own personal use, and it's still in the process of being turned into something generally usable. Right now the documentation is this README and "read the source". In a couple places you will need to modify the source yourself.
 
-Putting `{..._edit}` on an element makes a thing draggable, see [`object-map.tsx`](https://github.com/ysulyma/ractive-editor/blob/master/src/thumb-recorder.tsx) and [`draggable.ts`](https://github.com/ysulyma/ractive-editor/blob/master/src/draggable.ts)
+Putting `{...draggable}` on an element makes a thing draggable, see [`object-map.tsx`](https://github.com/ysulyma/ractive-editor/blob/master/src/object-map.tsx) and [`draggable.ts`](https://github.com/ysulyma/ractive-editor/blob/master/src/draggable.ts)
 
 ## Usage
 ```JSX
