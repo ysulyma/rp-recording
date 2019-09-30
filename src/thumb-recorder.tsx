@@ -1,5 +1,4 @@
-// import * as chrome from 'chrome';
-declare const chrome: any;
+/// <reference types="chrome"/>
 import * as React from "react";
 
 import * as dom from "./utils/dom";
@@ -46,14 +45,15 @@ const THUMB_OPTIONS = {
 };
 
 // the actual thingy that gets exported
-export default class ThumbRecorder extends Player.PureReceiver<{}, State> {
+export default class ThumbRecorder extends React.PureComponent<{}, State> {
   private player: Player;
+  static contextType = Player.Context;
 
   private port: any;
 
-  constructor(props: ({player: Player})) {
-    super(props);
-    this.player = props.player;
+  constructor(props: {}, context: Player) {
+    super(props, context);
+    this.player = context;
 
     bind(this, ["recordThumbs", "togglePane"]);
 
@@ -73,7 +73,7 @@ export default class ThumbRecorder extends Player.PureReceiver<{}, State> {
 
   async recordThumbs() {
     // XXX should have interface to specify this instead of hard-coding.
-    const extensionId = "mokgmmlldhhiafndljjdiaegiffnfogo";
+    const extensionId = "fljhedgmfkefnmfglilbcjhacefdkhbn";
 
     const wasFullScreen = isFullScreen();
 
@@ -90,7 +90,7 @@ export default class ThumbRecorder extends Player.PureReceiver<{}, State> {
     await sleep(6000);
 
     const {playback} = this.player;
-    for (let t = 0, len = playback.length; t <= len; t += frequency * 1000) {
+    for (let t = 0, len = playback.duration; t <= len; t += frequency * 1000) {
       playback.seek(t);
 
       await sleep(100);
@@ -199,7 +199,7 @@ function hideUI(): Change[] {
 }
 
 function restoreUI(oldState: Change[]) {
-  for (let [elt, prop, val] of oldState) {
+  for (const [elt, prop, val] of oldState) {
     elt.style[prop] = val;
   }
 }

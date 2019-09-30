@@ -1,12 +1,9 @@
-import {aspectRatio, Utils} from "ractive-player";
+import {Utils} from "ractive-player";
 
-const {screenToSVGVector} = Utils.graphics,
-      {dragHelper} = Utils.interactivity;
+const {dragHelper} = Utils.interactivity;
 
 import * as dom from "./utils/dom";
 const {$, $$} = dom;
-
-const global: any = window;
 
 type DElement = HTMLElement | SVGElement;
 
@@ -40,14 +37,14 @@ const Editor = {
       let left, top;
 
       if (node instanceof HTMLElement || node instanceof SVGSVGElement) {
-        left = Math.round(parseFloat(node.style.left.slice(0,-4)) / aspectRatio),
-        top = Math.round(parseFloat(node.style.top.slice(0,-4)) / aspectRatio);
+        left = Math.round(parseFloat(node.style.left.slice(0,-1))),
+        top = Math.round(parseFloat(node.style.top.slice(0,-1)));
       } else {
         left = node.getAttribute(svgXAttr(node)),
         top = node.getAttribute(svgYAttr(node));
       }
 
-      coordsBox.textContent = `(${left},${top})`;
+      coordsBox.textContent = `(${left}%, ${top}%)`;
 
       document.body.appendChild(coordsBox);
     }
@@ -57,20 +54,19 @@ const Editor = {
 
       const x = offset.left + e.pageX - lastX,
             y = offset.top + e.pageY - lastY,
-            vmin = Math.min(innerWidth, innerHeight) / 100,
-            left = x / vmin,
-            top = y / vmin;
+            left = x / offset.width * 100,
+            top = y / offset.height * 100;
 
       lastX = e.pageX;
       lastY = e.pageY;
 
       Object.assign(node.style, {
-        left: `${left}vmin`,
-        top: `${top}vmin`
+        left: `${left}%`,
+        top: `${top}%`
       });
 
       // update the box
-      coordsBox.textContent = `(${Math.round(left / aspectRatio)}, ${Math.round(top / aspectRatio)})`;
+      coordsBox.textContent = `(${Math.round(left)}%, ${Math.round(top)}%)`;
     }
 
     function mouseMoveSVG(e: MouseEvent) {
@@ -82,7 +78,7 @@ const Editor = {
 
       if (node instanceof SVGGElement) {
         const t = node.transform.baseVal;
-        window.t = t;
+
         if (t.numberOfItems === 0) {
           t.appendItem(node.ownerSVGElement.createSVGTransform());
         }
@@ -140,31 +136,41 @@ function svgParent(node: SVGElement): SVGSVGElement {
 
 // stupid helper function
 function offsetParent(node: HTMLElement | SVGElement) {
-  if (typeof (<HTMLElement>node).offsetLeft !== "undefined" && typeof (<HTMLElement>node).offsetTop !== "undefined")
-    return { left: (<HTMLElement>node).offsetLeft, top: (<HTMLElement>node).offsetTop };
+  if (assertHTML(node)) {
+    if (typeof node.offsetLeft !== "undefined" && typeof node.offsetTop !== "undefined") {
+      return {
+        left: node.offsetLeft,
+        top: node.offsetTop,
+        width: node.offsetParent.getBoundingClientRect().width,
+        height: node.offsetParent.getBoundingClientRect().height
+      };
+    }
+  }
 
   const rect = node.getBoundingClientRect();
 
   let parent = node;
-  while (parent = <HTMLElement>parent.parentNode) {
+  while (parent = parent.parentNode as HTMLElement) {
     if (!["absolute", "relative"].includes(getComputedStyle(parent).position)) continue;
 
     const prect = parent.getBoundingClientRect();
 
-    return { left: rect.left - prect.left, top: rect.top - prect.top };
+    return { left: rect.left - prect.left, top: rect.top - prect.top, width: prect.width, height: prect.height };
   }
 
-  return { left: rect.left, top: rect.top };
+  return { left: rect.left, top: rect.top, width: innerWidth, height: innerHeight };
 }
 
 // global.offsetParent = offsetParent;
 
+export const draggable = { "data-re-draggable": "yes" };
+
 export default function() {
-  global._edit = { "data-ractive-editor-draggable": "yes" };
+  (window as any)._edit = draggable;
   
   document.addEventListener("DOMContentLoaded", () => {
-    $$("*[data-ractive-editor-draggable]").forEach(Editor.makeDraggable);
-  });  
+    $$("*[data-re-draggable]").forEach(Editor.makeDraggable);
+  });
 }
 
 // TypeScript shenanigans
@@ -174,4 +180,16 @@ function assertHTML(node: DElement): node is HTMLElement {
 
 function assertSVG(node: DElement): node is SVGElement {
   return true;
+}
+
+
+function screenToSVGVector(svg: SVGSVGElement, dx: number, dy: number): [number, number] {
+  const rect = svg.getBoundingClientRect(),
+        viewBox = svg.viewBox.baseVal,
+        aspectX = rect.width / viewBox.width,
+        aspectY = rect.height / viewBox.height,
+        svgDx = dx / aspectX,
+        svgDy = dy / aspectY;
+
+  return [svgDx, svgDy];
 }
