@@ -1,23 +1,40 @@
-import * as React from 'react';
+import * as React from "react";
 
-import {Player, Plugin} from 'ractive-player';
+import {Player, Plugin, HookFunction, HookMap} from "ractive-player";
 
-import EditorControls from './controls';
-import dragFunctionality from './draggable';
+import dragFunctionality from "./draggable";
+import {RecorderPlugin} from "./recorder";
 
-class EditorPlugin {
+import ObjectMap from "./object-map";
+import ThumbRecorder from "./thumb-recorder";
+
+import {RecorderComponent} from "./recorder";
+import {AudioRecorderPlugin} from "./recorders/audio-recorder";
+import {CueRecorderPlugin} from "./recorders/cue-recorder";
+
+class EditorPlugin implements Plugin {
+  private recorders: RecorderPlugin[];
+
   constructor() {
-    this.recorders = {}
+    this.recorders = [AudioRecorderPlugin, CueRecorderPlugin];
   }
 
-  setup(hook) {
-    hook('classNames', () => 'editor');
+  addRecorder(...plugins: RecorderPlugin[]) {
+    this.recorders.push(...plugins);
+  }
 
-    hook('canvasClick', () => false);
+  setup(hook: HookFunction<keyof HookMap>) {
+    hook("classNames", () => "editor");
 
-    hook('controls', () => {
+    hook("canvasClick", () => false);
+
+    hook("controls", () => {
       return (
-        <EditorControls key="rpe"/>
+        <div className="editor-controls" key="rpe">
+          <ObjectMap/>
+          <ThumbRecorder/>
+          <RecorderComponent plugins={this.recorders}/>
+        </div>
       );
     });
 
@@ -26,3 +43,7 @@ class EditorPlugin {
 }
 
 export default new EditorPlugin();
+
+export {draggable} from "./draggable";
+
+export {Recorder, RecorderConfigureComponent, RecorderPlugin} from "./recorder";
