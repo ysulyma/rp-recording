@@ -1,10 +1,3 @@
-// XXX BOOO
-type MediaRecorder = any;
-type BlobEvent = any;
-
-declare const RACTIVE_GLOBAL: any;
-declare const MediaRecorder: MediaRecorder;
-
 import * as React from "react";
 import {Recorder, RecorderConfigureComponent, RecorderPlugin} from "../recorder";
 
@@ -12,9 +5,10 @@ import {on, off} from "../utils/events";
 
 import {Player, Utils} from "ractive-player";
 const {bind} = Utils.misc,
-      {formatTimeMs} = Utils.time;
+      {formatTimeMs, parseTime} = Utils.time;
 
-type Cue = [string, string];
+type Cue = [string, number];
+type CueFormatted = [string, string];
 
 const cueIcon = (
   <text
@@ -26,6 +20,7 @@ export class CueRecorder implements Recorder {
   private player: Player;
 
   private captureStart: number;
+
   private pauseTime: number;
   private lastPauseTime: number;
   private paused: boolean;
@@ -60,25 +55,38 @@ export class CueRecorder implements Recorder {
     this.paused = false;
   }
 
-  async endRecording() {
+  endRecording(time: number) {
     off(document.body, "keydown", this.onKeyDown);
-    this.captureCues(this.player.script.slideName);
-    return this.cueCapture;
+    this.captureCues(time, this.player.script.markerName);
+  }
+
+  finalizeRecording(startDelay: number, stopDelay: number) {
+    console.dir({
+      startDelay,
+      stopDelay,
+      cueSum: this.cueCapture.map(_ => _[1]).reduce((a, b) => a+b,0)
+    });
+    
+    this.cueCapture[0][1] -= startDelay;
+    this.cueCapture[this.cueCapture.length - 1][1] += stopDelay;
+    
+    return this.cueCapture.map(cue => [cue[0], formatTimeMs(cue[1])]);
   }
 
   onKeyDown(e: KeyboardEvent) {
+    const t = performance.now();
     if (this.paused) return;
 
     const {script} = this.player;
     if (!this.player.$controls.captureKeys) return;
 
     if (e.key.toLowerCase() === "e")
-      this.captureCues(script.slides[script.slideIndex - 1][0]);
+      this.captureCues(t, script.markers[script.markerIndex - 1][0]);
   }
 
-  captureCues(slideName: string) {
-    const t = performance.now() - this.captureStart - this.pauseTime;
-    this.cueCapture.push([slideName, formatTimeMs(t - this.lastTime)]);
+  captureCues(time: number, markerName: string) {
+    const t = time - this.captureStart - this.pauseTime;
+    this.cueCapture.push([markerName, t - this.lastTime]);
 
     this.lastTime = t;
   }
@@ -103,7 +111,7 @@ export class CueConfigureComponent extends RecorderConfigureComponent {
   }
 }
 
-export function CueSaveComponent(props: {data: Cue[]}) {
+export function CueSaveComponent(props: {data: CueFormatted[]}) {
   return (
     <>
       <th key="head" scope="row">
@@ -125,3 +133,7 @@ export const CueRecorderPlugin = {
   configureComponent: CueConfigureComponent,
   saveComponent: CueSaveComponent
 };
+
+function format(data: any) {
+  return JSON.stringify(data, null, 2).replace(/\[\s+"(.+?)",\s+"(.+?)"\s+\]/g, "[\"$1\", \"$2\"]");
+}

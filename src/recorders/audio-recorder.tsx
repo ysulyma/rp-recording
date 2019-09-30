@@ -1,20 +1,12 @@
-// XXX BOOO
-type MediaRecorder = any;
-type BlobEvent = any;
-
-declare const MediaRecorder: MediaRecorder;
+import "../types/MediaRecorder";
 
 import * as React from "react";
-import {Recorder, RecorderPlugin, RecorderConfigureComponent} from "../recorder";
-import {on} from "../utils/events";
+import {Recorder, RecorderPlugin, RecorderConfigureComponent, IntransigentReturn} from "../recorder";
 
-type Cue = [string, string];
-
-interface AudioRecorderState {
-  paneOpen: boolean;
-  recording: boolean;
-  files: string[];
-  cues: Cue[][];
+interface RecordData {
+  startDelay: number;
+  stopDelay: number;
+  url: string;
 }
 
 const audioIcon = (
@@ -24,7 +16,6 @@ const audioIcon = (
       transform="translate(-140.62 -173.21)"
     >
       <path
-        opacity=".99"
         d="m568.57 620.93c0 116.77-94.66 211.43-211.43 211.43s-211.43-94.66-211.43-211.43v-0.00001"
         fillOpacity="0"
         transform="translate(14.904)"
@@ -32,7 +23,6 @@ const audioIcon = (
         strokeWidth="20"
       />
       <path
-        opacity=".99"
         d="m568.57 620.93c0 116.77-94.66 211.43-211.43 211.43s-211.43-94.66-211.43-211.43v-0.00001"
         fillOpacity="0"
         transform="translate(14.904)"
@@ -46,7 +36,6 @@ const audioIcon = (
       />
       <path
         fill="#FFF"
-        opacity=".99"
         d="m197.14 920.93c0.00001-18.935 59.482-34.286 132.86-34.286 73.375 0 132.86 15.35 132.86 34.286z"
         transform="translate(42.047 34.286)"
         strokeLinecap="round"
@@ -54,7 +43,6 @@ const audioIcon = (
       />
       <path
         fill="#FFF"
-        opacity=".99"
         strokeWidth="21.455"
         strokeLinecap="round"
         d="m372.06 183.94c-77.019-0.00001-139.47 62.45-139.47 139.47v289.62c0 77.019 62.45 139.47 139.47 139.47 77.019 0 139.44-62.45 139.44-139.47v-289.62c0-77.02-62.42-139.47-139.44-139.47z"
@@ -65,31 +53,63 @@ const audioIcon = (
 
 export class AudioRecorder implements Recorder {
   private recorder: MediaRecorder;
-  private promise: Promise<string>;
+  private promise: Promise<IntransigentReturn>;
+
+  private baseTime: number;
+  private blob: Blob;
+
+  private stream: MediaStream;
+  private startTime: number;
+  private endTime: number;
+
+  private static stream: MediaStream;
+
+  static intransigent = true;
+
+  /* this is responsible for most of start delay */
+  static init() {
+    if (location.protocol !== "https:") return;
+    
+    try {
+      navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
+        this.stream = stream;
+      });
+    } catch (e) {
+      console.log("no recording allowed");
+    }
+  }
 
   beginRecording(baseTime: number) {
-    if (document.location.protocol !== "https:") alert("Page must be accessed via HTTPS in order to record audio");
+    if (!AudioRecorder.stream)
+      throw new Error("Navigator stream not available");
+    if (document.location.protocol !== "https:")
+      throw new Error("Page must be accessed via HTTPS in order to record audio");
+
+    this.baseTime = baseTime;
     
     this.promise = new Promise(async (resolve, reject) => {
       // record the audio
-      const stream = await navigator.mediaDevices.getUserMedia({audio: true});
-
       const chunks: Blob[] = [];
-      this.recorder = new MediaRecorder(stream);
+      this.recorder = new MediaRecorder(AudioRecorder.stream, {mimeType: "audio/webm"});
 
       // subscribe to events
-      on(this.recorder, "dataavailable", (e: BlobEvent) => {
+      this.recorder.addEventListener("dataavailable", e => {
         chunks.push(e.data);
       });
 
-      on(this.recorder, "stop", () => {
-        const blob = new Blob(chunks, {type: "audio/webm"});
-
-        resolve(URL.createObjectURL(blob));
+      this.recorder.addEventListener("start", () => {
+        this.startTime = performance.now();
       });
 
-      // start recording with 1 second time between receiving 'ondataavailable' events
-      this.recorder.start(1000);
+      this.recorder.addEventListener("stop", () => {
+        const stopDelay = performance.now() - this.endTime;
+
+        this.blob = new Blob(chunks, {type: "audio/webm"});
+
+        resolve([this.startTime - baseTime, stopDelay]);
+      });
+
+      this.recorder.start();
     });
   }
 
@@ -101,11 +121,17 @@ export class AudioRecorder implements Recorder {
     this.recorder.resume();
   }
 
-  async endRecording() {
+  async endRecording(endTime: number) {
+    this.endTime = endTime;
     this.recorder.stop();
     return this.promise;
   }
+
+  finalizeRecording() {
+    return URL.createObjectURL(this.blob);
+  }
 }
+AudioRecorder.init();
 
 export class AudioConfigureComponent extends RecorderConfigureComponent {
   render() {
@@ -137,7 +163,9 @@ export function AudioSaveComponent(props: {data: string}) {
       </th>
       <td key="cell">
         {props.data ?
-          <a download="audio.webm" href={props.data}>Download Audio</a> :
+          <>
+            <a download="audio.webm" href={props.data}>Download Audio</a>
+          </> :
           "Audio not yet available"
         }
       </td>
@@ -145,10 +173,9 @@ export function AudioSaveComponent(props: {data: string}) {
   );
 }
 
-export const AudioRecorderPlugin = {
+export const AudioRecorderPlugin: RecorderPlugin = {
   name: "AudioRecorder",
   recorder: AudioRecorder,
   configureComponent: AudioConfigureComponent,
   saveComponent: AudioSaveComponent
 };
-
