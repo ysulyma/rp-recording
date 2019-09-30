@@ -1,22 +1,20 @@
-const webpack = require('webpack');
-const { CheckerPlugin } = require('awesome-typescript-loader')
+const webpack = require("webpack");
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
   entry: `${__dirname}/src/plugin.tsx`,
   output: {
-    filename: 'ractive-editor.js',
+    filename: process.env.NODE_ENV === "development" ? "ractive-editor.js" : "ractive-editor.min.js",
     path: `${__dirname}/dist`,
-    library: 'RactiveEditor'
+    library: "RactiveEditor"
   },
 
+  devtool: false,
+
   externals: {
-    "chrome": "chrome",
-    "mathjax": "MathJax",
-    "prop-types": "PropTypes",
     "ractive-player": "RactivePlayer",
     "react": "React",
-    "react-dom": "ReactDOM",
-    "three": "THREE"
+    "react-dom": "ReactDOM"
   },
 
   mode: process.env.NODE_ENV,
@@ -25,26 +23,30 @@ module.exports = {
     rules: [
      {
         test: /\.[jt]sx?$/,
-        loader: "awesome-typescript-loader",
-        options: {
-          configFileName: `${__dirname}/tsconfig.json`
-        }
+        loader: "ts-loader"
       }
     ]
   },
 
   optimization: {
+    minimizer: [
+      new TerserPlugin({
+        parallel: true,
+        terserOptions: {
+          safari10: true
+        }
+      })
+    ],
     noEmitOnErrors: false
   },
 
   plugins: [
-    new CheckerPlugin(),
     new webpack.BannerPlugin({
-      banner: () => require('fs').readFileSync('./LICENSE', {encoding: 'utf8'})
+      banner: () => require("fs").readFileSync("./LICENSE", {encoding: "utf8"})
     })
   ],
 
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
+    extensions: [".ts", ".tsx", ".js", ".jsx", ".json"]
   }
 };
