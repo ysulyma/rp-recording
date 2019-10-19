@@ -1,7 +1,5 @@
 import * as React from "react";
 
-import {on} from "./utils/events";
-
 import {Player, Utils} from "ractive-player";
 const {bind} = Utils.misc;
 
@@ -22,7 +20,7 @@ export interface Recorder {
   pauseRecording(time: number): void;
   resumeRecording(time: number): void;
   endRecording(time: number): Promise<IntransigentReturn> | void;
-  finalizeRecording(startDelay: number, stopDelay: number): any;
+  finalizeRecording(startDelay: number, stopDelay: number): unknown;
 }
 
 interface RCCProps {
@@ -96,15 +94,15 @@ export class RecorderComponent extends React.PureComponent<RecorderComponentProp
   }
 
   componentDidMount() {
-    on(document.body, "keydown", this.onKeyDown);
-    on(window, "beforeunload", (e: BeforeUnloadEvent) => {
+    document.body.addEventListener("keydown", this.onKeyDown);
+    window.addEventListener("beforeunload", (e: BeforeUnloadEvent) => {
       if (this.state.recordings.length > 0)
         e.returnValue = "You have recording data";
     });
   }
 
   onKeyDown(e: KeyboardEvent) {
-    if (!this.player.$controls.captureKeys) return;
+    if (!this.player.controls.captureKeys) return;
 
     if (e.code === "Digit2" && e.altKey && e.metaKey) {
       this.state.isRecording ? this.endRecording(true) : this.beginRecording();

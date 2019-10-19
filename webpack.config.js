@@ -4,9 +4,9 @@ const TerserPlugin = require("terser-webpack-plugin");
 module.exports = {
   entry: `${__dirname}/src/plugin.tsx`,
   output: {
-    filename: process.env.NODE_ENV === "development" ? "ractive-editor.js" : "ractive-editor.min.js",
+    filename: process.env.NODE_ENV === "development" ? "rp-recording.js" : "rp-recording.min.js",
     path: `${__dirname}/dist`,
-    library: "RactiveEditor"
+    library: "RPRecording"
   },
 
   devtool: false,

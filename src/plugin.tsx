@@ -1,14 +1,8 @@
 import * as React from "react";
 
-import {Player, Plugin, HookFunction, HookMap} from "ractive-player";
+import {Plugin, HookFunction, HookMap} from "ractive-player";
 
-import dragFunctionality from "./draggable";
-import {RecorderPlugin} from "./recorder";
-
-import ObjectMap from "./object-map";
-import ThumbRecorder from "./thumb-recorder";
-
-import {RecorderComponent} from "./recorder";
+import {RecorderComponent, RecorderPlugin} from "./recorder";
 import {AudioRecorderPlugin} from "./recorders/audio-recorder";
 import {CueRecorderPlugin} from "./recorders/cue-recorder";
 
@@ -30,20 +24,12 @@ class EditorPlugin implements Plugin {
 
     hook("controls", () => {
       return (
-        <div className="editor-controls" key="rpe">
-          <ObjectMap/>
-          <ThumbRecorder/>
-          <RecorderComponent plugins={this.recorders}/>
-        </div>
+        <RecorderComponent key="rp-recorder" plugins={this.recorders}/>
       );
     });
-
-    dragFunctionality();
   }
 }
 
 export default new EditorPlugin();
-
-export {draggable} from "./draggable";
 
 export {Recorder, RecorderConfigureComponent, RecorderPlugin} from "./recorder";

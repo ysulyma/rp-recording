@@ -13,10 +13,6 @@ declare const RactiveEditor: EditorPlugin;
 
 export default RactiveEditor;
 
-export const draggable: {
-	"data-ractive-editor-draggable": "yes";
-}
-
 export interface RecorderPlugin {
   name: string;
   recorder: {
@@ -34,7 +30,7 @@ export interface Recorder {
   pauseRecording(time: number): void;
   resumeRecording(time: number): void;
   endRecording(time: number): Promise<IntransigentReturn> | void;
-  finalizeRecording(startDelay: number, stopDelay: number): any;
+  finalizeRecording(startDelay: number, stopDelay: number): unknown;
 }
 
 export abstract class RecorderConfigureComponent extends React.PureComponent<{setPluginActive: (active: boolean) => void;}, {active: boolean;}> {

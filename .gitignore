@@ -4,3 +4,8 @@
 
 # ignore node_modules
 /node_modules/*
+
+# generated files
+/dist/rp-recording.js
+/dist/rp-recording.min.js
+/dist/rp-recording.css

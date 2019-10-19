@@ -1,35 +1,35 @@
 {
-  "name": "ractive-editor",
-  "version": "0.5.0",
-  "description": "Plugin for making 'ractives' to be played by ractive-player",
-  "main": "./dist/ractive-editor.js",
-  "types": "./dist/ractive-editor.d.ts",
+  "name": "rp-recording",
+  "version": "1.0.0",
+  "description": "Recording functionality for ractive-player",
+  "main": "./dist/rp-recording.js",
+  "types": "./dist/rp-recording.d.ts",
   "files": [
     "/dist"
   ],
   "scripts": {
-    "css": "stylus -c -o dist/ styl/ractive-editor.styl"
+    "css": "stylus -c -o dist/ styl/rp-recording.styl"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ysulyma/ractive-editor.git"
+    "url": "git+https://github.com/ysulyma/rp-recording.git"
   },
   "author": "Yuri Sulyma <yuri@lmqm.xyz>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ysulyma/ractive-editor/issues"
+    "url": "https://github.com/ysulyma/rp-recording/issues"
   },
-  "homepage": "https://github.com/ysulyma/ractive-editor#readme",
+  "homepage": "https://github.com/ysulyma/rp-recording#readme",
   "devDependencies": {
     "@types/chrome": "0.0.69",
     "@types/react": "^16.9.2",
     "@types/react-dom": "^16.9.0",
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
-    "awesome-typescript-loader": "^5.2.1",
     "banner-webpack-plugin": "^0.2.3",
     "eslint": "^6.2.2",
-    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-react": "^7.16.0",
+    "eslint-plugin-react-hooks": "^2.1.2",
     "nib": "^1.1.2",
     "stylus": "^0.54.7",
     "ts-loader": "^6.1.2",

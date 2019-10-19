@@ -1,8 +1,6 @@
 import * as React from "react";
 import {Recorder, RecorderConfigureComponent, RecorderPlugin} from "../recorder";
 
-import {on, off} from "../utils/events";
-
 import {Player, Utils} from "ractive-player";
 const {bind} = Utils.misc,
       {formatTimeMs, parseTime} = Utils.time;
@@ -42,7 +40,7 @@ export class CueRecorder implements Recorder {
     this.paused = false;
     this.pauseTime = 0;
 
-    on(document.body, "keydown", this.onKeyDown);
+    document.body.addEventListener("keydown", this.onKeyDown);
   }
 
   pauseRecording(time: number) {
@@ -56,17 +54,11 @@ export class CueRecorder implements Recorder {
   }
 
   endRecording(time: number) {
-    off(document.body, "keydown", this.onKeyDown);
+    document.body.removeEventListener("keydown", this.onKeyDown);
     this.captureCues(time, this.player.script.markerName);
   }
 
   finalizeRecording(startDelay: number, stopDelay: number) {
-    console.dir({
-      startDelay,
-      stopDelay,
-      cueSum: this.cueCapture.map(_ => _[1]).reduce((a, b) => a+b,0)
-    });
-    
     this.cueCapture[0][1] -= startDelay;
     this.cueCapture[this.cueCapture.length - 1][1] += stopDelay;
     
@@ -78,7 +70,7 @@ export class CueRecorder implements Recorder {
     if (this.paused) return;
 
     const {script} = this.player;
-    if (!this.player.$controls.captureKeys) return;
+    if (!this.player.controls.captureKeys) return;
 
     if (e.key.toLowerCase() === "e")
       this.captureCues(t, script.markers[script.markerIndex - 1][0]);
