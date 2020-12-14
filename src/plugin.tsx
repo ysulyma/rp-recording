@@ -1,20 +1,27 @@
 import * as React from "react";
 
-import {Plugin, HookFunction, HookMap} from "ractive-player";
+import type {Broadcast, Plugin, HookFunction, HookMap} from "ractive-player";
 
-import {RecorderComponent, RecorderPlugin} from "./recorder";
+import Control from "./Control";
 import {AudioRecorderPlugin} from "./recorders/audio-recorder";
-import {CueRecorderPlugin} from "./recorders/cue-recorder";
+import {MarkerRecorderPlugin} from "./recorders/marker-recorder";
+
+import type {RecorderPlugin} from "./types";
 
 class EditorPlugin implements Plugin {
+  private broadcast?: Broadcast;
   private recorders: RecorderPlugin[];
 
   constructor() {
-    this.recorders = [AudioRecorderPlugin, CueRecorderPlugin];
+    this.recorders = [AudioRecorderPlugin, MarkerRecorderPlugin];
   }
 
   addRecorder(...plugins: RecorderPlugin[]) {
     this.recorders.push(...plugins);
+  }
+
+  broadcastTo(broadcast: Broadcast) {
+    this.broadcast = broadcast;
   }
 
   setup(hook: HookFunction<keyof HookMap>) {
@@ -24,7 +31,7 @@ class EditorPlugin implements Plugin {
 
     hook("controls", () => {
       return (
-        <RecorderComponent key="rp-recorder" plugins={this.recorders}/>
+        <Control key="rp-recorder" broadcast={this.broadcast} plugins={this.recorders}/>
       );
     });
   }
@@ -32,4 +39,5 @@ class EditorPlugin implements Plugin {
 
 export default new EditorPlugin();
 
-export {Recorder, RecorderConfigureComponent, RecorderPlugin} from "./recorder";
+export {Recorder} from "./recorder";
+export {ReplayDataRecorder} from "./recorders/replay-data-recorder";

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import {Player, Utils} from "ractive-player";
+import {Broadcast, Player, Utils} from "ractive-player";
 const {bind} = Utils.misc;
 
 export interface RecorderPlugin {
@@ -9,18 +9,23 @@ export interface RecorderPlugin {
     intransigent?: boolean;
     new(player: Player): Recorder;
   };
-  configureComponent: typeof RecorderConfigureComponent;
+  configureComponent: React.FC
   saveComponent: React.FC<{data: any}>;
 }
 
 export type IntransigentReturn = [number, number]
 
-export interface Recorder {
-  beginRecording(time: number): void;
-  pauseRecording(time: number): void;
-  resumeRecording(time: number): void;
-  endRecording(time: number): Promise<IntransigentReturn> | void;
-  finalizeRecording(startDelay: number, stopDelay: number): unknown;
+export abstract class Recorder {
+  abstract beginRecording(time: number): void;
+  abstract pauseRecording(time: number): void;
+  abstract resumeRecording(time: number): void;
+  abstract endRecording(time: number): Promise<IntransigentReturn> | void;
+  abstract finalizeRecording(startDelay: number, stopDelay: number): unknown;  
+
+  abstract provide(values: {
+    player: Player;
+    save: (value: unknown) => void;
+  }): void;
 }
 
 interface RCCProps {
@@ -31,24 +36,12 @@ interface RCCState {
   active: boolean;
 }
 
-export abstract class RecorderConfigureComponent extends React.PureComponent<RCCProps, RCCState> {
-  constructor(props: RCCProps) {
-    super(props);
-
-    bind(this, ["toggleActive"]);
-
-    this.state = {
-      active: false
-    };
-  }
-
-  toggleActive() {
-    this.props.setPluginActive(!this.state.active);
-    this.setState({active: !this.state.active});
-  }
-}
+export type RecorderConfigureComponent = React.ComponentType<{
+  setPluginActive: (active: boolean) => void;
+}>;
 
 interface RecorderComponentProps {
+  broadcast?: Broadcast;
   plugins: RecorderPlugin[];
 }
 
@@ -61,6 +54,7 @@ interface RecorderComponentState {
 
 export class RecorderComponent extends React.PureComponent<RecorderComponentProps, RecorderComponentState> {
   player: Player;
+  private broadcast?: Broadcast;
   private plugins: RecorderPlugin[];
   private intransigentRecorder: Recorder;
   pluginMap: {[x: string]: RecorderPlugin};
@@ -72,6 +66,8 @@ export class RecorderComponent extends React.PureComponent<RecorderComponentProp
     super(props, context);
     this.plugins = props.plugins;
     this.player = context;
+
+    this.broadcast = props.broadcast;
 
     this.isPluginActive = {};
     this.pluginMap = {};
@@ -102,7 +98,7 @@ export class RecorderComponent extends React.PureComponent<RecorderComponentProp
   }
 
   onKeyDown(e: KeyboardEvent) {
-    if (!this.player.controls.captureKeys) return;
+    if (!this.player.captureKeys) return;
 
     if (e.code === "Digit2" && e.altKey && e.metaKey) {
       this.state.isRecording ? this.endRecording(true) : this.beginRecording();
@@ -126,7 +122,14 @@ export class RecorderComponent extends React.PureComponent<RecorderComponentProp
     for (const plugin of this.plugins) {
       if (!this.isPluginActive[plugin.name]) continue;
 
+      // this sucks!! (there is some AudioRecorder reason for it...)
       const recorder = new plugin.recorder(this.player);
+      recorder.provide({
+        player: this.player,
+        save: (value: unknown) => {
+          
+        }
+      });
       recorder.beginRecording(baseTime);
       this.activeRecorders.set(plugin, recorder);
 
@@ -137,7 +140,8 @@ export class RecorderComponent extends React.PureComponent<RecorderComponentProp
       }
     }
 
-    if (this.activeRecorders.size === 0) alert("No recorders active!");
+    if (this.activeRecorders.size === 0)
+      alert("No recorders active!");
 
     this.setState({
       isRecording: true

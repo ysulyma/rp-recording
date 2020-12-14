@@ -1,7 +1,9 @@
 import "../types/MediaRecorder";
 
 import * as React from "react";
-import {Recorder, RecorderPlugin, RecorderConfigureComponent, IntransigentReturn} from "../recorder";
+
+import {Recorder, IntransigentReturn} from "../recorder";
+import type {RecorderPlugin} from "../types";
 
 interface RecordData {
   startDelay: number;
@@ -9,8 +11,8 @@ interface RecordData {
   url: string;
 }
 
-const audioIcon = (
-  <svg x="0" y="10" height="80" viewBox="0 0 462.86 792.01">
+const icon = (
+  <g transform="scale(0.126261032057) translate(164.575)">
     <g
       stroke="#FFF"
       transform="translate(-140.62 -173.21)"
@@ -48,27 +50,28 @@ const audioIcon = (
         d="m372.06 183.94c-77.019-0.00001-139.47 62.45-139.47 139.47v289.62c0 77.019 62.45 139.47 139.47 139.47 77.019 0 139.44-62.45 139.44-139.47v-289.62c0-77.02-62.42-139.47-139.44-139.47z"
       />
     </g>
-  </svg>
+  </g>
 );
 
-export class AudioRecorder implements Recorder {
-  private recorder: MediaRecorder;
+export class AudioRecorder extends Recorder<Blob, string> {
+  private mediaRecorder: MediaRecorder;
   private promise: Promise<IntransigentReturn>;
 
   private baseTime: number;
   private blob: Blob;
 
-  private stream: MediaStream;
+  stream: MediaStream;
   private startTime: number;
   private endTime: number;
 
-  private static stream: MediaStream;
+  intransigent = true;
 
-  static intransigent = true;
+  constructor() {
+    super();
 
-  /* this is responsible for most of start delay */
-  static init() {
-    if (location.protocol !== "https:") return;
+    // can only record over HTTPS
+    if (location.protocol !== "https:")
+      return;
     
     try {
       navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
@@ -79,103 +82,70 @@ export class AudioRecorder implements Recorder {
     }
   }
 
-  beginRecording(baseTime: number) {
-    if (!AudioRecorder.stream)
+  beginRecording() {
+    if (!this.stream)
       throw new Error("Navigator stream not available");
     if (document.location.protocol !== "https:")
       throw new Error("Page must be accessed via HTTPS in order to record audio");
-
-    this.baseTime = baseTime;
     
     this.promise = new Promise(async (resolve, reject) => {
       // record the audio
-      const chunks: Blob[] = [];
-      this.recorder = new MediaRecorder(AudioRecorder.stream, {mimeType: "audio/webm"});
+      this.mediaRecorder = new MediaRecorder(this.stream, {mimeType: "audio/webm"});
 
       // subscribe to events
-      this.recorder.addEventListener("dataavailable", e => {
-        chunks.push(e.data);
+      this.mediaRecorder.addEventListener("dataavailable", e => {
+        this.push(e.data);
       });
 
-      this.recorder.addEventListener("start", () => {
-        this.startTime = performance.now();
+      let startDelay: number;
+      this.mediaRecorder.addEventListener("start", () => {
+        startDelay = this.manager.getTime();
       });
 
-      this.recorder.addEventListener("stop", () => {
-        const stopDelay = performance.now() - this.endTime;
-
-        this.blob = new Blob(chunks, {type: "audio/webm"});
-
-        resolve([this.startTime - baseTime, stopDelay]);
+      this.mediaRecorder.addEventListener("stop", () => {
+        resolve([startDelay, this.manager.getTime()]);
       });
 
-      this.recorder.start();
+      this.mediaRecorder.start();
     });
   }
 
   pauseRecording() {
-    this.recorder.pause();
+    this.mediaRecorder.pause();
   }
 
   resumeRecording() {
-    this.recorder.resume();
+    this.mediaRecorder.resume();
   }
 
-  async endRecording(endTime: number) {
-    this.endTime = endTime;
-    this.recorder.stop();
+  async endRecording() {
+    this.mediaRecorder.stop();
     return this.promise;
   }
 
-  finalizeRecording() {
-    return URL.createObjectURL(this.blob);
-  }
-}
-AudioRecorder.init();
-
-export class AudioConfigureComponent extends RecorderConfigureComponent {
-  render() {
-    const classNames = ["recorder-plugin-icon"];
-
-    if (this.state.active)
-      classNames.push("active");
-
-    return (
-      <div className="recorder-plugin" title="Record audio">
-        <svg className={classNames.join(" ")} height="36" width="36" viewBox="0 0 100 100" onClick={this.toggleActive}>
-          <rect height="100" width="100" fill={this.state.active ? "red" : "#222"}/>
-          {audioIcon}
-        </svg>
-        <span className="recorder-plugin-name">Audio</span>
-      </div>
-    );
+  finalizeRecording(chunks: Blob[]) {
+    return URL.createObjectURL(new Blob(chunks, {type: "audio/webm"}));
   }
 }
 
 export function AudioSaveComponent(props: {data: string}) {
   return (
     <>
-      <th key="head" scope="row">
-        <svg className="recorder-plugin-icon" height="36" width="36" viewBox="0 0 100 100">
-          <rect height="100" width="100" fill="#222"/>
-          {audioIcon}
-        </svg>
-      </th>
-      <td key="cell">
-        {props.data ?
-          <>
-            <a download="audio.webm" href={props.data}>Download Audio</a>
-          </> :
-          "Audio not yet available"
-        }
-      </td>
+    {props.data ?
+      <a download="audio.webm" href={props.data}>Download Audio</a>
+      :
+      "Audio not yet available"
+    }
     </>
   );
 }
 
+const recorder = new AudioRecorder();
 export const AudioRecorderPlugin: RecorderPlugin = {
-  name: "AudioRecorder",
-  recorder: AudioRecorder,
-  configureComponent: AudioConfigureComponent,
-  saveComponent: AudioSaveComponent
+  enabled: () => typeof recorder.stream !== "undefined",
+  icon,
+  name: "Audio",
+  recorder,
+  saveComponent: AudioSaveComponent,
+  title: "Record audio"
 };
