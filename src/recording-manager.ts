@@ -1,6 +1,6 @@
-import {Player, Utils} from "ractive-player";
+import {Utils} from "ractive-player";
 const {bind} = Utils.misc;
-import type {Broadcast, ReplayData} from "ractive-player";
+import type {Player} from "ractive-player";
 
 import {EventEmitter} from "events";
 import type StrictEventEmitter from "strict-event-emitter-types";
@@ -9,25 +9,30 @@ import type {IntransigentReturn, Recorder} from "./recorder";
 import type {RecorderPlugin} from "./types";
 
 interface EventTypes {
-  "activechange": boolean;
-  "pausedchange": boolean;
+  "cancel": void;
+  "capture": (key: string, data: unknown) => void;
+  "finalize": (key: string, data: unknown) => void;
+  "pause": void;
+  "resume": void;
+  "start": void;
 }
 
 export default class RecordingManager {
+  active: boolean;
+  duration: number;
+  hub: StrictEventEmitter<EventEmitter, EventTypes>;
+  paused: boolean;
+
   /**
   Time when recording began.
   */
   private baseTime: number;
-
-  private broadcast?: Broadcast;
 
   private captureData: {
     [key: string]: unknown[];
   }
   private player: Player;
   private plugins: RecorderPlugin[];
-
-  hub: StrictEventEmitter<EventEmitter, EventTypes>;
 
   private intransigentRecorder: Recorder;
 
@@ -41,17 +46,7 @@ export default class RecordingManager {
   */
   private pauseTime: number;
 
-  private __paused: boolean;
-  private __active: boolean;
-
-  private pollTimeout: number;
-
-  /**
-  Last duration we pushed to the server.
-  */
-  lastBroadcastDuration: number;
-
-  constructor(player: Player) {
+  constructor(player?: Player) {
     this.player = player;
 
     this.captureData = {};
@@ -59,10 +54,10 @@ export default class RecordingManager {
     this.hub = new EventEmitter() as StrictEventEmitter<EventEmitter, EventTypes>;
     this.hub.setMaxListeners(0);
 
-    this.__paused = false;
-    this.__active = false;
+    this.paused = false;
+    this.active = false;
 
-    bind(this, ["beginRecording", "endRecording", "pauseRecording", "resumeRecording", "capture", "poll"]);
+    bind(this, ["beginRecording", "endRecording", "pauseRecording", "resumeRecording", "capture"]);
   }
 
   beginRecording(plugins: RecorderPlugin[]) {
@@ -77,12 +72,12 @@ export default class RecordingManager {
       const {recorder} = plugin;
 
       recorder.provide({
-        push: (value: unknown) => this.capture(plugin, value),
+        push: (value: unknown) => this.capture(plugin.key, value),
         manager: this,
         player: this.player
       });
       
-      this.captureData[plugin.name] = [];
+      this.captureData[plugin.key] = [];
 
       if (recorder.intransigent) {
         if (this.intransigentRecorder)
@@ -97,43 +92,24 @@ export default class RecordingManager {
       plugin.recorder.beginRecording();
     }
 
-    if (this.broadcast) {
-      this.broadcast.start()
-      .then(() => requestAnimationFrame(this.poll));
-    }
     this.paused = false;
     this.active = true;
+
+    this.hub.emit("start");
   }
 
-  capture<T>(plugin: RecorderPlugin, value: unknown) {
-    this.captureData[plugin.name].push(value);
-  }
+  capture(key: string, value: unknown) {
+    this.captureData[key].push(value);
 
-  /**
-  @param broadcast
-  */
-  broadcastTo(broadcast: Broadcast) {
-    this.broadcast = broadcast;
-    this.lastBroadcastDuration = 0;
-  }
-
-  async poll() {
-    const duration = this.getTime();
-    const update = {};
-    for (const plugin of this.plugins) {
-      update[plugin.name] = plugin.recorder.getUpdate(this.captureData[plugin.name], this.lastBroadcastDuration);
-    }
-    this.lastBroadcastDuration = await this.broadcast.push(duration, update);
-
-    if (this.active)
-      window.setTimeout(this.poll, 100);
+    this.hub.emit("capture", key, value);
   }
 
   /**
-  @param save True to save the recording, false to discard it.
+  End recording and collect finalized data from recorders.
   */
-  async endRecording(): Promise<any> {
+  async endRecording(): Promise<unknown> {
     const endTime = this.getTime();
+    this.duration = endTime;
     const recording = {};
 
     let startDelay = 0,
@@ -155,50 +131,29 @@ export default class RecordingManager {
 
     // get start/stop delays from intransigentRecorder
     if (this.intransigentRecorder) {
-      const [startTime, stopTime] = await promise;
-      startDelay = startTime;
-      stopDelay = stopTime - endTime;      
+      try {
+        const [startTime, stopTime] = await promise;
+        startDelay = startTime;
+        stopDelay = stopTime - endTime;      
+        this.duration = this.duration + stopDelay - startDelay;
+      } catch (e) {
+        startDelay = 0;
+        stopDelay = 0;
+        console.error(e);
+      }
     }
 
     // finalize
     for (const plugin of this.plugins) {
-      recording[plugin.name] = plugin.recorder.finalizeRecording(this.captureData[plugin.name], startDelay, stopDelay);
+      recording[plugin.key] = plugin.recorder.finalizeRecording(this.captureData[plugin.key], startDelay, stopDelay);
+      this.hub.emit("finalize", plugin.key, recording[plugin.key]);
     }
 
-    // clean up
     this.active = false;
 
+    this.hub.emit("finalize", undefined, undefined);
+
     return recording;
-  }
-
-  /**
-  Whether recording is currently paused.
-  */
-  get paused() {
-    return this.__paused;
-  }
-
-  set paused(paused) {
-    if (paused === this.__paused)
-      return;
-
-    this.__paused = paused;
-    this.hub.emit("pausedchange", this.__paused);
-  }
-
-  /**
-  Whether recording is in progress.
-  */
-  get active() {
-    return this.__active;
-  }
-
-  set active(active) {
-    if (active === this.__active)
-      return;
-
-    this.__active = active;
-    this.hub.emit("activechange", this.__active);
   }
 
   getTime() {
@@ -215,6 +170,11 @@ export default class RecordingManager {
     }
 
     this.paused = true;
+    this.hub.emit("pause");
+  }
+
+  setPlayer(player: Player) {
+    this.player = player;
   }
   
   /**
@@ -228,5 +188,6 @@ export default class RecordingManager {
     }
 
     this.paused = false;
+    this.hub.emit("resume");
   }
 }

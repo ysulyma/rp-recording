@@ -53,7 +53,7 @@ const icon = (
   </g>
 );
 
-export class AudioRecorder extends Recorder<Blob, string> {
+export class AudioRecorder extends Recorder<Blob, Blob> {
   private mediaRecorder: MediaRecorder;
   private promise: Promise<IntransigentReturn>;
 
@@ -124,15 +124,15 @@ export class AudioRecorder extends Recorder<Blob, string> {
   }
 
   finalizeRecording(chunks: Blob[]) {
-    return URL.createObjectURL(new Blob(chunks, {type: "audio/webm"}));
+    return new Blob(chunks, {type: "audio/webm"});
   }
 }
 
-export function AudioSaveComponent(props: {data: string}) {
+export function AudioSaveComponent(props: {data: Blob}) {
   return (
     <>
     {props.data ?
-      <a download="audio.webm" href={props.data}>Download Audio</a>
+      <a download="audio.webm" href={URL.createObjectURL(props.data)}>Download Audio</a>
       :
       "Audio not yet available"
     }
@@ -144,6 +144,7 @@ const recorder = new AudioRecorder();
 export const AudioRecorderPlugin: RecorderPlugin = {
   enabled: () => typeof recorder.stream !== "undefined",
   icon,
+  key: "audio",
   name: "Audio",
   recorder,
   saveComponent: AudioSaveComponent,

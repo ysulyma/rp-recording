@@ -1,43 +1,43 @@
 {
   "name": "rp-recording",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Recording functionality for ractive-player",
   "main": "./dist/rp-recording.js",
   "types": "./dist/rp-recording.d.ts",
   "files": [
     "/dist"
   ],
-  "scripts": {
-    "css": "stylus -c -o dist/ styl/rp-recording.styl"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ysulyma/rp-recording.git"
   },
-  "author": "Yuri Sulyma <yuri@lmqm.xyz>",
+  "author": "Yuri Sulyma <yuri@ractive-player.org>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/ysulyma/rp-recording/issues"
   },
   "homepage": "https://github.com/ysulyma/rp-recording#readme",
   "devDependencies": {
-    "@types/chrome": "0.0.69",
-    "@types/react": "^16.9.2",
-    "@types/react-dom": "^16.9.0",
-    "@typescript-eslint/eslint-plugin": "^2.0.0",
-    "@typescript-eslint/parser": "^2.0.0",
+    "@types/chrome": "0.0.127",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.11.1",
+    "@typescript-eslint/parser": "^4.11.1",
     "banner-webpack-plugin": "^0.2.3",
-    "eslint": "^6.2.2",
-    "eslint-plugin-react": "^7.16.0",
-    "eslint-plugin-react-hooks": "^2.1.2",
+    "eslint": "^7.16.0",
+    "eslint-plugin-react": "^7.21.5",
     "nib": "^1.1.2",
-    "stylus": "^0.54.7",
-    "ts-loader": "^6.1.2",
-    "typescript": "^3.6.2",
-    "webpack": "^4.39.3",
-    "webpack-cli": "^3.3.7"
+    "ractive-player": "^1.1.1",
+    "stylus": "^0.54.8",
+    "ts-loader": "^8.0.12",
+    "typescript": "^4.1.3",
+    "webpack": "^5.11.1",
+    "webpack-cli": "^4.3.0"
   },
   "peerDependencies": {
-    "ractive-player": "^1.0.1"
+    "ractive-player": "^2.0.1"
+  },
+  "dependencies": {
+    "strict-event-emitter-types": "^2.0.0"
   }
 }

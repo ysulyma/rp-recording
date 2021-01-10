@@ -1,38 +1,68 @@
 import * as React from "react";
-import {Player, Plugin, HookFunction, HookMap} from "ractive-player";
+import {EventEmitter} from "events";
+import StrictEventEmitter from "strict-event-emitter-types";
+import {Player, ReplayData} from "ractive-player";
 
-interface EditorPlugin extends Plugin {
-	recorders: {};
-
-  addRecorder(...plugins: RecorderPlugin[]): void;
-
-	setup(hook: HookFunction<keyof HookMap>);
-}
-
-declare const RactiveEditor: EditorPlugin;
-
-export default RactiveEditor;
-
-export interface RecorderPlugin {
-  name: string;
-  recorder: {
-    intransigent?: boolean;
-    new(player: Player): Recorder;
-  };
-  configureComponent: typeof RecorderConfigureComponent;
-  saveComponent: React.FC<{data: any}>;
-}
+export const RecordingControl: (props: {
+  manager?: RecordingManager;
+  plugins?: RecorderPlugin[];
+}) => JSX.Element;
 
 export type IntransigentReturn = [number, number];
 
-export interface Recorder {
-  beginRecording(time: number): void;
-  pauseRecording(time: number): void;
-  resumeRecording(time: number): void;
-  endRecording(time: number): Promise<IntransigentReturn> | void;
-  finalizeRecording(startDelay: number, stopDelay: number): unknown;
+export class RecordingManager {
+  active: boolean;
+  duration: number;
+  paused: boolean;
+  hub: StrictEventEmitter<EventEmitter, {
+    "cancel": void;
+    "capture": (key: string, data: unknown) => void;
+    "finalize": (key: string, data: unknown) => void;
+    "pause": void;
+    "resume": void;
+    "start": void;
+  }>;
+
+  constructor(player?: Player);
+  beginRecording(plugins: RecorderPlugin[]): void;
+  capture<T>(key: string, value: unknown): void;
+  endRecording(): Promise<{
+    [key: string]: unknown;
+  }>;
+  getTime(): number;
+  pauseRecording(): void;
+  resumeRecording(): void;
+  setPlayer(player: Player): void;
 }
 
-export abstract class RecorderConfigureComponent extends React.PureComponent<{setPluginActive: (active: boolean) => void;}, {active: boolean;}> {
-  toggleActive(): void;
+export class Recorder<T = unknown> {
+  protected manager: RecordingManager;
+  protected player: Player;
+
+  intransigent: boolean;
+
+  beginRecording(): void;
+  pauseRecording(): void;
+  resumeRecording(): void;
+  endRecording(): Promise<IntransigentReturn> | void;
+  finalizeRecording(startDelay: number, stopDelay: number): unknown;  
+  push(value: T): void;
 }
+
+export class ReplayDataRecorder<T> extends Recorder<ReplayData<T>> {
+  capture(time: number, value: T): void;
+}
+
+export type RecorderConfigureComponent = React.ComponentType<{
+  setPluginActive: (active: boolean) => void;
+}>;
+
+export interface RecorderPlugin<T = unknown> {
+  icon: JSX.Element;
+  name: string;
+  recorder: Recorder<T>;
+  saveComponent: React.ComponentType<{data: unknown}>;
+}
+
+export const AudioRecorderPlugin: RecorderPlugin<Blob>;
+export const MarkerRecorderPlugin: RecorderPlugin<[string, number]>;

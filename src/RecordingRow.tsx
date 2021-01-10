@@ -9,7 +9,7 @@ interface Props {
   data: {
     [key: string]: any;
   };
-  pluginsByName: {
+  pluginsByKey: {
     [key: string]: RecorderPlugin;
   };
 }
@@ -22,7 +22,7 @@ export default function RecordingRow(props: Props) {
     setName(e.target.value);
   }, []);
 
-  const {data, pluginsByName} = props;
+  const {data, pluginsByKey} = props;
 
   return (
     <li className="recording-row">
@@ -36,12 +36,12 @@ export default function RecordingRow(props: Props) {
       />
       <table className="recording-results">
         <tbody>
-          {Object.keys(data).map(pluginName => {
-            const plugin = pluginsByName[pluginName],
+          {Object.keys(data).map(pluginKey => {
+            const plugin = pluginsByKey[pluginKey],
                   SaveComponent = plugin.saveComponent;
 
             return (
-              <tr key={pluginName}>
+              <tr key={pluginKey}>
                 <th key="head" scope="row">
                   <svg className="recorder-plugin-icon" height="36" width="36" viewBox="0 0 100 100">
                     <rect height="100" width="100" fill="#222"/>
@@ -49,7 +49,7 @@ export default function RecordingRow(props: Props) {
                   </svg>
                 </th>
                 <td key="cell">
-                  <SaveComponent data={data[pluginName]}/>
+                  <SaveComponent data={data[pluginKey]}/>
                 </td>
               </tr>);
           })}

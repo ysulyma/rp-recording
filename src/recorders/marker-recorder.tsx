@@ -64,18 +64,19 @@ export class MarkerRecorder extends Recorder<Marker, MarkerFormatted[]> {
 export function MarkerSaveComponent(props: {data: MarkerFormatted[]}) {
   return (
     <>
-      <textarea readOnly value={JSON.stringify(props.data, null, 2)}></textarea>
+      <textarea readOnly value={format(props.data)}></textarea>
     </>
   );
 }
 
 export const MarkerRecorderPlugin: RecorderPlugin = {
   icon,
+  key: "markers",
   name: "Markers",
   recorder: new MarkerRecorder,
   saveComponent: MarkerSaveComponent
 };
 
-function format(data: any) {
+function format(data: unknown) {
   return JSON.stringify(data, null, 2).replace(/\[\s+"(.+?)",\s+"(.+?)"\s+\]/g, "[\"$1\", \"$2\"]");
 }

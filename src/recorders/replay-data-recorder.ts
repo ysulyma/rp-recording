@@ -11,11 +11,17 @@ import type {ReplayData} from "ractive-player";
 
 export class ReplayDataRecorder<T> extends Recorder<[number, T]> {
   private duration: number;
+  private index: number;
 
   constructor() {
     super();
     this.duration = 0;
-    this.index = 0;
+    this.index = -1;
+  }
+
+  beginRecording() {
+    this.duration = 0;
+    this.index = -1;
   }
 
   finalizeRecording(data: ReplayData<T>, startDelay = 0, stopDelay = 0) {
@@ -38,14 +44,11 @@ export class ReplayDataRecorder<T> extends Recorder<[number, T]> {
   }
 
   capture(time: number, data: T) {
+    if (time - this.duration < 0) {
+      // console.error(time, this.duration, data);
+    }
     this.push([time - this.duration, data]);
     this.duration = time;
-  }
-
-  getUpdate(data: ReplayData<T>) {
-    const update = data.slice(this.index);
-    this.index = data.length-1;
-    return update;
   }
 }
 

@@ -37,7 +37,7 @@ module.exports = {
         }
       })
     ],
-    noEmitOnErrors: false
+    emitOnErrors: true
   },
 
   plugins: [
