@@ -1,6 +1,6 @@
 {
   "name": "rp-recording",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Recording functionality for ractive-player",
   "main": "./dist/rp-recording.js",
   "types": "./dist/rp-recording.d.ts",
@@ -27,7 +27,7 @@
     "eslint": "^7.17.0",
     "eslint-plugin-react": "^7.22.0",
     "nib": "^1.1.2",
-    "ractive-player": "^1.1.1",
+    "ractive-player": "^2.0.4",
     "stylus": "^0.54.8",
     "ts-loader": "^8.0.14",
     "typescript": "^4.1.3",
@@ -35,7 +35,7 @@
     "webpack-cli": "^4.3.1"
   },
   "peerDependencies": {
-    "ractive-player": "^2.0.1"
+    "ractive-player": "^2.0.4"
   },
   "dependencies": {
     "strict-event-emitter-types": "^2.0.0"
