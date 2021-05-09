@@ -88,7 +88,7 @@ export default function Control(props: Props) {
     if (active) {
       endRecording().then(recording => setRecordings(prev => prev.concat(recording)));
     } else {
-      beginRecording(plugins);
+      beginRecording(plugins.filter(plugin => activePlugins.current[plugin.key]));
     }
   }, []);
 
