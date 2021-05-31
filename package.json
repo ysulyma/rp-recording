@@ -1,6 +1,6 @@
 {
   "name": "rp-recording",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Recording functionality for ractive-player",
   "main": "./dist/rp-recording.js",
   "types": "./dist/rp-recording.d.ts",

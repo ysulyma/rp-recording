@@ -6,15 +6,25 @@ module.exports = {
   output: {
     filename: process.env.NODE_ENV === "development" ? "rp-recording.js" : "rp-recording.min.js",
     path: `${__dirname}/dist`,
-    library: "RPRecording"
+    library: "RPRecording",
+    libraryTarget: "umd"
   },
 
   devtool: false,
 
   externals: {
-    "ractive-player": "RactivePlayer",
-    "react": "React",
-    "react-dom": "ReactDOM"
+    "ractive-player": {
+      commonjs: "ractive-player",
+      commonjs2: "ractive-player",
+      amd: "ractive-player",
+      root: "RactivePlayer"
+    },
+    "react": {
+      commonjs: "react",
+      commonjs2: "react",
+      amd: "react",
+      root: "React"
+    }
   },
 
   mode: process.env.NODE_ENV,
