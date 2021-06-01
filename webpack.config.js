@@ -31,10 +31,14 @@ module.exports = {
 
   module: {
     rules: [
-     {
+      {
         test: /\.[jt]sx?$/,
         loader: "ts-loader"
-      }
+      },
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"]
+      },
     ]
   },
 

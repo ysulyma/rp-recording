@@ -1,6 +1,6 @@
 {
   "name": "rp-recording",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "Recording functionality for ractive-player",
   "main": "./dist/rp-recording.js",
   "types": "./dist/rp-recording.d.ts",
@@ -16,6 +16,9 @@
   "bugs": {
     "url": "https://github.com/ysulyma/rp-recording/issues"
   },
+  "scripts": {
+    "css": "stylus -c -w -o style.css styl/rp-recording.styl"
+  },
   "homepage": "https://github.com/ysulyma/rp-recording#readme",
   "devDependencies": {
     "@types/chrome": "0.0.128",
@@ -24,10 +27,12 @@
     "@typescript-eslint/eslint-plugin": "^4.12.0",
     "@typescript-eslint/parser": "^4.12.0",
     "banner-webpack-plugin": "^0.2.3",
+    "css-loader": "^5.2.6",
     "eslint": "^7.17.0",
     "eslint-plugin-react": "^7.22.0",
     "nib": "^1.1.2",
     "ractive-player": "^2.0.4",
+    "style-loader": "^2.0.0",
     "stylus": "^0.54.8",
     "ts-loader": "^8.0.14",
     "typescript": "^4.1.3",
@@ -35,7 +40,7 @@
     "webpack-cli": "^4.3.1"
   },
   "peerDependencies": {
-    "ractive-player": "^2.0.4"
+    "ractive-player": "^2.0.5"
   },
   "dependencies": {
     "strict-event-emitter-types": "^2.0.0"

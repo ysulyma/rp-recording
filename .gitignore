@@ -8,4 +8,4 @@
 # generated files
 /dist/rp-recording.js
 /dist/rp-recording.min.js
-/dist/rp-recording.css
+style.css

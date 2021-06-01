@@ -1,4 +1,4 @@
-import * as React from "react";
+import "../style.css";
 
 export type {RecorderPlugin} from "./types";
 
