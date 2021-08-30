@@ -1,7 +1,7 @@
 {
   "name": "rp-recording",
-  "version": "2.1.0",
-  "description": "Recording functionality for ractive-player",
+  "version": "2.1.1",
+  "description": "Recording functionality for Liqvid",
   "main": "./dist/rp-recording.js",
   "types": "./dist/rp-recording.d.ts",
   "files": [
@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/ysulyma/rp-recording.git"
   },
-  "author": "Yuri Sulyma <yuri@ractive-player.org>",
+  "author": "Yuri Sulyma <yuri@liqvidjs.org>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/ysulyma/rp-recording/issues"
