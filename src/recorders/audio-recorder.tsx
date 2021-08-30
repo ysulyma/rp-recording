@@ -68,25 +68,24 @@ export class AudioRecorder extends Recorder<Blob, Blob> {
 
   constructor() {
     super();
+    let requestRecording = async function(){
+      // Only need to do this once...
+      window.removeEventListener("click", requestRecording);
+      try {
+        this.stream = await navigator.mediaDevices.getUserMedia({audio: true});
+      } catch (e) {
+        // User said no or browser rejected request due to insecure context
+        console.log("no recording allowed");
+      }
+    }.bind(this);
 
-    // can only record over HTTPS
-    if (location.protocol !== "https:")
-      return;
-    
-    try {
-      navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
-        this.stream = stream;
-      });
-    } catch (e) {
-      console.log("no recording allowed");
-    }
+    // Need user interaction to request media
+    window.addEventListener("click", requestRecording);
   }
 
   beginRecording() {
     if (!this.stream)
       throw new Error("Navigator stream not available");
-    if (document.location.protocol !== "https:")
-      throw new Error("Page must be accessed via HTTPS in order to record audio");
     
     this.promise = new Promise(async (resolve, reject) => {
       // record the audio
