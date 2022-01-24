@@ -10,6 +10,7 @@ import {RecordingManager} from "./recording-manager";
 
 import {RecordingRow} from "./RecordingRow";
 
+import {VideoRecorderPlugin} from "./recorders/video-recorder";
 import {AudioRecorderPlugin} from "./recorders/audio-recorder";
 import {MarkerRecorderPlugin} from "./recorders/marker-recorder";
 
@@ -44,7 +45,7 @@ export default function Control(props: Props) {
   // default plugins
   // is this bad
   const plugins = useMemo(() => [
-    AudioRecorderPlugin, MarkerRecorderPlugin, ...(props.plugins ?? [])
+    VideoRecorderPlugin, AudioRecorderPlugin, MarkerRecorderPlugin, ...(props.plugins ?? [])
   ], [props.plugins]);
 
   // prevent canvasClick
