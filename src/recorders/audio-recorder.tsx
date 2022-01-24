@@ -1,5 +1,3 @@
-import "../types/MediaRecorder";
-
 import * as React from "react";
 
 import {Recorder, IntransigentReturn} from "../recorder";
