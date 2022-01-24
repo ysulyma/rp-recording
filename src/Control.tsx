@@ -1,4 +1,3 @@
-import * as React from "react";
 import {useCallback, useEffect, useMemo, useReducer, useRef, useState} from "react";
 
 import {KeyMap, Utils, usePlayer} from "liqvid";
@@ -37,7 +36,7 @@ const bindings = {
   discard: mac ? "Alt+Meta+4" : "Ctrl+Alt+4"
 };
 
-export default function Control(props: Props) {
+export function RecordingControl(props: Props) {
   const player = usePlayer();
   const [recordings, setRecordings] = useState([]);
   const forceUpdate = useForceUpdate();
@@ -210,9 +209,9 @@ export default function Control(props: Props) {
   ];
 
   return (
-    <div id="rp-recording">
-      <div id="rp-recording-dialog" style={dialogStyle}>
-        <table id="rp-recording-configuration">
+    <div id="lv-recording">
+      <div id="lv-recording-dialog" style={dialogStyle}>
+        <table id="lv-recording-configuration">
           <tbody>
             <tr>
               <th colSpan={2}>Commands</th>
