@@ -1,5 +1,5 @@
 import type {Player} from "liqvid";
-import type RecordingManager from "./recording-manager";
+import type {RecordingManager} from "./recording-manager";
 
 export type IntransigentReturn = [number, number];
 

@@ -83,7 +83,7 @@ export class AudioRecorder extends Recorder<Blob, Blob> {
     if (!this.stream)
       throw new Error("Navigator stream not available");
     
-    this.promise = new Promise(async (resolve, reject) => {
+    this.promise = new Promise(async (resolve) => {
       // record the audio
       this.mediaRecorder = new MediaRecorder(this.stream, {mimeType: "audio/webm"});
 

@@ -1,14 +1,14 @@
 import * as React from "react";
 import {useCallback, useEffect, useMemo, useReducer, useRef, useState} from "react";
 
-import {KeyMap, Utils, usePlayer} from "ractive-player";
+import {KeyMap, Utils, usePlayer} from "liqvid";
 const {onClick} = Utils.mobile;
 const {useForceUpdate} = Utils.react;
 
 import type {RecorderPlugin} from "./types";
-import RecordingManager from "./recording-manager";
+import {RecordingManager} from "./recording-manager";
 
-import RecordingRow from "./RecordingRow";
+import {RecordingRow} from "./RecordingRow";
 
 import {AudioRecorderPlugin} from "./recorders/audio-recorder";
 import {MarkerRecorderPlugin} from "./recorders/marker-recorder";
@@ -55,12 +55,20 @@ export default function Control(props: Props) {
   // recording manager
   const manager = useRef<RecordingManager>();
 
+  // manager subscriptions
   useEffect(() => {
     manager.current = props.manager ?? new RecordingManager(player);
-    manager.current.hub.on("finalize", forceUpdate);
-    manager.current.hub.on("start", forceUpdate);
-    manager.current.hub.on("pause", forceUpdate);
-    manager.current.hub.on("resume", forceUpdate);
+    manager.current.on("finalize", forceUpdate);
+    manager.current.on("start", forceUpdate);
+    manager.current.on("pause", forceUpdate);
+    manager.current.on("resume", forceUpdate);
+
+    return () => {
+      manager.current.off("finalize", forceUpdate);
+      manager.current.off("start", forceUpdate);
+      manager.current.off("pause", forceUpdate);
+      manager.current.off("resume", forceUpdate);
+    };
   }, []);
 
   // active plugins
@@ -100,11 +108,11 @@ export default function Control(props: Props) {
   }, []);
 
   const discard = useCallback(async () => {
-    const {active, endRecording, hub} = manager.current;
+    const {active, endRecording} = manager.current;
     if (active) {
-      const listeners = hub.listeners("finalize") as (Parameters<typeof hub.on>[1])[];
+      const listeners = manager.current.listeners("finalize") as (Parameters<typeof manager.current.on>[1])[];
       for (const listener of listeners) {
-        hub.off("finalize", listener);
+        manager.current.off("finalize", listener);
       }
       try {
         await endRecording();
@@ -113,7 +121,7 @@ export default function Control(props: Props) {
       }
 
       for (const listener of listeners) {
-        hub.on("finalize", listener);
+        manager.current.on("finalize", listener);
       }
 
       forceUpdate();
@@ -121,8 +129,6 @@ export default function Control(props: Props) {
   }, []);
 
   /* keyboard controls */
-  // just to make React shut up about onChange
-  const prevent = useCallback(() => {}, []);
 
   const callbacks = useMemo(() => ({start, pause, discard}), []);
 
@@ -156,9 +162,6 @@ export default function Control(props: Props) {
     // bind sequence
     const seq = e.currentTarget.dataset.value;
     dispatch({command: name, seq});
-
-    // resume key capture
-    player.resumeKeyCapture();
   }, []);
   
   // display shortcut sequence
@@ -218,7 +221,7 @@ export default function Control(props: Props) {
                 <th scope="row">{desc}</th>
                 <td>
                   <input
-                    onBlur={onBlur} readOnly onFocus={player.suspendKeyCapture} onKeyDown={identifyKey}
+                    onBlur={onBlur} readOnly onKeyDown={identifyKey}
                     className="shortcut" name={key} type="text" value={fmtSeq(state[key])}/>
                 </td>
               </tr>
@@ -227,7 +230,7 @@ export default function Control(props: Props) {
         </table>
 
         <h3>Configuration</h3>
-        {plugins.map((plugin, i) => {
+        {plugins.map((plugin) => {
           const classNames = ["recorder-plugin-icon"];
 
           if (activePlugins.current[plugin.key])

@@ -5,8 +5,7 @@ export type {RecorderPlugin} from "./types";
 import RecordingControl from "./Control";
 export {RecordingControl};
 
-import RecordingManager from "./recording-manager";
-export {RecordingManager};
+export {RecordingManager} from "./recording-manager";
 
 export {Recorder} from "./recorder";
 export {ReplayDataRecorder} from "./recorders/replay-data-recorder";

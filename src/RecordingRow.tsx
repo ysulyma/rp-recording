@@ -1,21 +1,16 @@
-import * as React from "react";
 import {useCallback, useState} from "react";
-
-import {usePlayer} from "liqvid";
-
 import type {RecorderPlugin} from "./types";
 
 interface Props {
   data: {
-    [key: string]: any;
+    [key: string]: unknown;
   };
   pluginsByKey: {
     [key: string]: RecorderPlugin;
   };
 }
 
-export default function RecordingRow(props: Props) {
-  const player = usePlayer();
+export function RecordingRow(props: Props) {
   const [name, setName] = useState("Untitled");
 
   const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,8 +23,6 @@ export default function RecordingRow(props: Props) {
     <li className="recording-row">
       <input
         className="recording-name"
-        onBlur={player.resumeKeyCapture}
-        onFocus={player.suspendKeyCapture}
         onChange={onChange}
         type="text"
         value={name}

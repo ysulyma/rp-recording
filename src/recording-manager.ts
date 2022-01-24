@@ -14,10 +14,9 @@ interface EventTypes {
   "start": void;
 }
 
-export default class RecordingManager {
+export class RecordingManager extends (EventEmitter as unknown as new () => StrictEventEmitter<EventEmitter, EventTypes>) {
   active: boolean;
   duration: number;
-  hub: StrictEventEmitter<EventEmitter, EventTypes>;
   paused: boolean;
 
   /**
@@ -44,12 +43,12 @@ export default class RecordingManager {
   private pauseTime: number;
 
   constructor(player?: Player) {
+    super();
     this.player = player;
 
     this.captureData = {};
 
-    this.hub = new EventEmitter() as StrictEventEmitter<EventEmitter, EventTypes>;
-    this.hub.setMaxListeners(0);
+    this.setMaxListeners(0);
 
     this.paused = false;
     this.active = false;
@@ -92,13 +91,13 @@ export default class RecordingManager {
     this.paused = false;
     this.active = true;
 
-    this.hub.emit("start");
+    this.emit("start");
   }
 
   capture(key: string, value: unknown) {
     this.captureData[key].push(value);
 
-    this.hub.emit("capture", key, value);
+    this.emit("capture", key, value);
   }
 
   /**
@@ -143,12 +142,12 @@ export default class RecordingManager {
     // finalize
     for (const plugin of this.plugins) {
       recording[plugin.key] = plugin.recorder.finalizeRecording(this.captureData[plugin.key], startDelay, stopDelay);
-      this.hub.emit("finalize", plugin.key, recording[plugin.key]);
+      this.emit("finalize", plugin.key, recording[plugin.key]);
     }
 
     this.active = false;
 
-    this.hub.emit("finalize", undefined, undefined);
+    this.emit("finalize", undefined, undefined);
 
     return recording;
   }
@@ -167,7 +166,7 @@ export default class RecordingManager {
     }
 
     this.paused = true;
-    this.hub.emit("pause");
+    this.emit("pause");
   }
 
   setPlayer(player: Player) {
@@ -185,6 +184,12 @@ export default class RecordingManager {
     }
 
     this.paused = false;
-    this.hub.emit("resume");
+    this.emit("resume");
   }
 }
+
+// backwards compatibility
+Object.defineProperty(RecordingManager.prototype, "hub", {get: function() {
+  console.info(".hub is deprecated, RecordingManager now extends EventEmitter");
+  return this;
+}});

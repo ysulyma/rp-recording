@@ -71,6 +71,6 @@ export const MarkerRecorderPlugin: RecorderPlugin = {
   saveComponent: MarkerSaveComponent
 };
 
-function format(data: unknown) {
+function format(data: MarkerFormatted[]) {
   return JSON.stringify(data, null, 2).replace(/\[\s+"(.+?)",\s+"(.+?)"\s+\]/g, "[\"$1\", \"$2\"]");
 }
