@@ -3,11 +3,11 @@ import {useMemo, useState} from "react";
 
 import {Recorder} from "../recorder";
 
-import {Player, Utils} from "ractive-player";
+import {Player, Utils} from "liqvid";
 const {bind} = Utils.misc,
       {onClick} = Utils.mobile,
       {formatTimeMs, parseTime} = Utils.time;
-import type {ReplayData} from "ractive-player";
+import type {ReplayData} from "liqvid";
 
 export class ReplayDataRecorder<T> extends Recorder<[number, T]> {
   private duration: number;

@@ -4,7 +4,7 @@ import {useMemo, useState} from "react";
 import {Recorder} from "../recorder";
 import type {RecorderPlugin} from "../types";
 
-import {Player, Utils} from "ractive-player";
+import {Player, Utils} from "liqvid";
 const {bind} = Utils.misc,
       {onClick} = Utils.mobile,
       {formatTimeMs} = Utils.time;

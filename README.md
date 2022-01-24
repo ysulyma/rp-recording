@@ -1,6 +1,6 @@
 # rp-recording
 
-> Recording functionality for [`ractive-player`](https://github.com/ysulyma/ractive-player/).
+> Recording functionality for [`liqvid`](https://github.com/ysulyma/liqvid/).
 
 Take a look at [`rp-cursor`](https://github.com/ysulyma/rp-cursor) for how to make a third-party recorder.
 
@@ -8,7 +8,7 @@ More documentation forthcoming.
 
 ## Usage
 ```tsx
-import {Player} from "ractive-player";
+import {Player} from "liqvid";
 import {RecordingControl} from "rp-recording";
 
 const controls = (<>

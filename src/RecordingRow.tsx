@@ -1,7 +1,7 @@
 import * as React from "react";
 import {useCallback, useState} from "react";
 
-import {usePlayer} from "ractive-player";
+import {usePlayer} from "liqvid";
 
 import type {RecorderPlugin} from "./types";
 
