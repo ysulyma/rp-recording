@@ -1,6 +1,4 @@
-import * as React from "react";
-
-import {Recorder, IntransigentReturn} from "../recorder";
+import {IntransigentReturn, Recorder} from "../recorder";
 import type {RecorderPlugin} from "../types";
 
 interface RecordData {
@@ -66,7 +64,7 @@ export class AudioRecorder extends Recorder<Blob, Blob> {
 
   constructor() {
     super();
-    let requestRecording = async function(){
+    const requestRecording = async function(){
       // Only need to do this once...
       window.removeEventListener("click", requestRecording);
       try {
@@ -128,11 +126,11 @@ export class AudioRecorder extends Recorder<Blob, Blob> {
 export function AudioSaveComponent(props: {data: Blob}) {
   return (
     <>
-    {props.data ?
-      <a download="audio.webm" href={URL.createObjectURL(props.data)}>Download Audio</a>
-      :
-      "Audio not yet available"
-    }
+      {props.data ?
+        <a download="audio.webm" href={URL.createObjectURL(props.data)}>Download Audio</a>
+        :
+        "Audio not yet available"
+      }
     </>
   );
 }

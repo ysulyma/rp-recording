@@ -8,6 +8,6 @@ export interface RecorderPlugin {
   key: string;
   name: string;
   recorder: Recorder;
-  saveComponent: React.FC<{data: any}>;
+  saveComponent: React.FC<{data: unknown}>;
   title?: string;
 }

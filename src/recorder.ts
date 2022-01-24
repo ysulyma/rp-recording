@@ -1,5 +1,4 @@
-import type {Player, ReplayData} from "liqvid";
-
+import type {Player} from "liqvid";
 import type RecordingManager from "./recording-manager";
 
 export type IntransigentReturn = [number, number];

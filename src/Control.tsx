@@ -1,7 +1,7 @@
 import * as React from "react";
 import {useCallback, useEffect, useMemo, useReducer, useRef, useState} from "react";
 
-import {KeyMap, Utils, usePlayer} from "liqvid";
+import {KeyMap, Utils, usePlayer} from "ractive-player";
 const {onClick} = Utils.mobile;
 const {useForceUpdate} = Utils.react;
 
@@ -71,7 +71,7 @@ export default function Control(props: Props) {
     for (const plugin of plugins) {
       activePlugins.current[plugin.key] = false;
     }
-  };
+  }
 
   // plugins dictionary
   const [pluginsByKey] = useState(() => {
@@ -279,7 +279,7 @@ function fmtSeq(str: string) {
     if (k === "Ctrl")
       return "^";
     else if (k === "Alt")
-      return "⌥"
+      return "⌥";
     if (k === "Shift")
       return "⇧";
     if (k === "Meta")

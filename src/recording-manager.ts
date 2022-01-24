@@ -1,10 +1,7 @@
-import {Utils} from "liqvid";
-const {bind} = Utils.misc;
-import type {Player} from "liqvid";
-
+import {bind} from "@liqvid/utils/misc";
 import {EventEmitter} from "events";
+import type {Player} from "liqvid";
 import type StrictEventEmitter from "strict-event-emitter-types";
-
 import type {IntransigentReturn, Recorder} from "./recorder";
 import type {RecorderPlugin} from "./types";
 
@@ -30,7 +27,7 @@ export default class RecordingManager {
 
   private captureData: {
     [key: string]: unknown[];
-  }
+  };
   private player: Player;
   private plugins: RecorderPlugin[];
 

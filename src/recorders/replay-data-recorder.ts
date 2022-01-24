@@ -1,13 +1,5 @@
-import * as React from "react";
-import {useMemo, useState} from "react";
-
-import {Recorder} from "../recorder";
-
-import {Player, Utils} from "liqvid";
-const {bind} = Utils.misc,
-      {onClick} = Utils.mobile,
-      {formatTimeMs, parseTime} = Utils.time;
 import type {ReplayData} from "liqvid";
+import {Recorder} from "../recorder";
 
 export class ReplayDataRecorder<T> extends Recorder<[number, T]> {
   private duration: number;

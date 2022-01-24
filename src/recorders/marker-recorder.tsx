@@ -1,13 +1,7 @@
-import * as React from "react";
-import {useMemo, useState} from "react";
-
+import {bind} from "@liqvid/utils/misc";
+import {formatTimeMs} from "@liqvid/utils/time";
 import {Recorder} from "../recorder";
 import type {RecorderPlugin} from "../types";
-
-import {Player, Utils} from "liqvid";
-const {bind} = Utils.misc,
-      {onClick} = Utils.mobile,
-      {formatTimeMs} = Utils.time;
 
 type Marker = [string, number];
 type MarkerFormatted = [string, string];
