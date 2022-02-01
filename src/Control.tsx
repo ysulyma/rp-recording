@@ -1,7 +1,7 @@
 import * as React from "react";
 import {useCallback, useEffect, useMemo, useReducer, useRef, useState} from "react";
 
-import {KeyMap, Utils, usePlayer} from "ractive-player";
+import {KeyMap, Utils, usePlayer} from "liqvid";
 const {onClick} = Utils.mobile;
 const {useForceUpdate} = Utils.react;
 

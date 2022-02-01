@@ -1,4 +1,4 @@
-import type {Player, ReplayData} from "ractive-player";
+import type {Player, ReplayData} from "liqvid";
 
 import type RecordingManager from "./recording-manager";
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import {Broadcast, Player, Utils} from "ractive-player";
+import {Player, Utils} from "liqvid";
 const {bind} = Utils.misc;
 
 export interface RecorderPlugin {
@@ -41,7 +41,6 @@ export type RecorderConfigureComponent = React.ComponentType<{
 }>;
 
 interface RecorderComponentProps {
-  broadcast?: Broadcast;
   plugins: RecorderPlugin[];
 }
 
@@ -54,7 +53,6 @@ interface RecorderComponentState {
 
 export class RecorderComponent extends React.PureComponent<RecorderComponentProps, RecorderComponentState> {
   player: Player;
-  private broadcast?: Broadcast;
   private plugins: RecorderPlugin[];
   private intransigentRecorder: Recorder;
   pluginMap: {[x: string]: RecorderPlugin};
@@ -66,8 +64,6 @@ export class RecorderComponent extends React.PureComponent<RecorderComponentProp
     super(props, context);
     this.plugins = props.plugins;
     this.player = context;
-
-    this.broadcast = props.broadcast;
 
     this.isPluginActive = {};
     this.pluginMap = {};

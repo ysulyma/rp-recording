@@ -1,6 +1,6 @@
-import {Utils} from "ractive-player";
+import {Utils} from "liqvid";
 const {bind} = Utils.misc;
-import type {Player} from "ractive-player";
+import type {Player} from "liqvid";
 
 import {EventEmitter} from "events";
 import type StrictEventEmitter from "strict-event-emitter-types";

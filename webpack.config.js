@@ -13,11 +13,11 @@ module.exports = {
   devtool: false,
 
   externals: {
-    "ractive-player": {
-      commonjs: "ractive-player",
-      commonjs2: "ractive-player",
-      amd: "ractive-player",
-      root: "RactivePlayer"
+    "liqvid": {
+      commonjs: "liqvid",
+      commonjs2: "liqvid",
+      amd: "liqvid",
+      root: "Liqvid"
     },
     "react": {
       commonjs: "react",

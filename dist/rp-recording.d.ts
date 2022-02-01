@@ -1,7 +1,7 @@
 import * as React from "react";
 import {EventEmitter} from "events";
 import StrictEventEmitter from "strict-event-emitter-types";
-import {Player, ReplayData} from "ractive-player";
+import {Player, ReplayData} from "liqvid";
 
 export const RecordingControl: (props: {
   manager?: RecordingManager;
